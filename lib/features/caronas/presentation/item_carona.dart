@@ -4,9 +4,10 @@ import '../../../../core/utils/formatadores.dart';
 import '../domain/carona_com_passageiro.dart';
 
 class ItemCarona extends StatelessWidget {
-  const ItemCarona({required this.item, super.key});
+  const ItemCarona({required this.item, this.onTap, super.key});
 
   final CaronaComPassageiro item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class ItemCarona extends StatelessWidget {
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+      onTap: onTap,
       leading: Icon(
         pago ? Icons.check_circle : Icons.schedule,
         color: cor,

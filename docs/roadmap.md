@@ -16,7 +16,7 @@ Regras: uma tarefa por vez; ao final de cada uma rodar `flutter analyze` e `flut
 - [x] **T1.4 Lista de caronas**
       Prompt: "Implemente a tela de lista de caronas (mais recentes primeiro), com resumo de total recebido e pendente no topo (RF02, RF07)."
 
-- [ ] **T1.5 Formulário de carona**
+- [x] **T1.5 Formulário de carona**
       Prompt: "Implemente o formulário de nova/editar carona: nome com autocomplete de passageiros existentes, valor em R$, data e switch 'pago' (RF01, RF03, RF06). Validar RN01 e RN02. Máximo de 3 toques no fluxo comum."
 
 - [ ] **T1.6 Pago/pendente e receita automática**

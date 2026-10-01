@@ -13,6 +13,12 @@ final caronaRepositoryProvider = Provider<CaronaRepository>(
   (ref) => CaronaRepository(ref.watch(appDatabaseProvider)),
 );
 
+final caronaPorIdProvider = FutureProvider.family<CaronaComPassageiro?, String>(
+  (ref, id) {
+    return ref.watch(caronaRepositoryProvider).buscarPorId(id);
+  },
+);
+
 final caronasFiltradasProvider =
     StreamProvider.family<List<CaronaComPassageiro>, CaronaFiltro>((
       ref,

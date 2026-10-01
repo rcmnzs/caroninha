@@ -174,6 +174,28 @@ class CaronaRepository {
         .toList(growable: false);
   }
 
+  Future<CaronaComPassageiro?> buscarPorId(String id) async {
+    final linha =
+        await (_database.select(_database.caronas).join([
+              innerJoin(
+                _database.passageiros,
+                _database.passageiros.id.equalsExp(
+                  _database.caronas.passageiroId,
+                ),
+              ),
+            ])..where(
+              _database.caronas.id.equals(id) &
+                  _database.caronas.excluido.equals(false),
+            ))
+            .getSingleOrNull();
+    if (linha == null) return null;
+
+    return CaronaComPassageiro(
+      carona: _mapearCarona(linha.readTable(_database.caronas)),
+      passageiro: _mapearPassageiro(linha.readTable(_database.passageiros)),
+    );
+  }
+
   Stream<List<CaronaComPassageiro>> watchFiltradas({
     CaronaFiltro filtro = const (
       inicio: null,

@@ -88,7 +88,7 @@ class _CaronasScreenState extends ConsumerState<CaronasScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/caronas/nova'),
+        onPressed: () => _abrirFormulario(context),
         icon: const Icon(Icons.add),
         label: const Text('Nova carona'),
       ),
@@ -129,7 +129,11 @@ class _CaronasScreenState extends ConsumerState<CaronasScreen> {
                   ?.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
-          for (final item in grupo.value) ItemCarona(item: item),
+          for (final item in grupo.value)
+            ItemCarona(
+              item: item,
+              onTap: () => _abrirFormulario(context, item.carona.id),
+            ),
         ],
       ],
     );
@@ -149,6 +153,27 @@ class _CaronasScreenState extends ConsumerState<CaronasScreen> {
             label: const Text('Tentar novamente'),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _abrirFormulario(
+    BuildContext context, [
+    String? caronaId,
+  ]) async {
+    final rota = caronaId == null
+        ? '/caronas/nova'
+        : '/caronas/$caronaId/editar';
+    final salvo = await context.push<bool>(rota);
+    if (!context.mounted || salvo != true) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          caronaId == null
+              ? 'Carona salva com sucesso.'
+              : 'Carona atualizada com sucesso.',
+        ),
       ),
     );
   }

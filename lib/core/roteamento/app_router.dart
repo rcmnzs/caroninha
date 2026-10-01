@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/caronas/presentation/carona_form_screen.dart';
 import '../../features/caronas/presentation/caronas_screen.dart';
-import '../../features/caronas/presentation/nova_carona_placeholder_screen.dart';
 import '../../features/configuracoes/presentation/configuracoes_placeholder_screen.dart';
 import '../../features/financeiro/presentation/financeiro_placeholder_screen.dart';
 
 class AppRouter {
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
   static final router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/caronas',
     routes: [
       StatefulShellRoute.indexedStack(
@@ -23,8 +26,18 @@ class AppRouter {
                 routes: [
                   GoRoute(
                     path: 'nova',
-                    builder: (context, state) =>
-                        const NovaCaronaPlaceholderScreen(),
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) =>
+                        _paginaDoFormulario(context, state),
+                  ),
+                  GoRoute(
+                    path: ':id/editar',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) => _paginaDoFormulario(
+                      context,
+                      state,
+                      caronaId: state.pathParameters['id'],
+                    ),
                   ),
                 ],
               ),
@@ -52,6 +65,36 @@ class AppRouter {
       ),
     ],
   );
+
+  static Page<void> _paginaDoFormulario(
+    BuildContext context,
+    GoRouterState state, {
+    String? caronaId,
+  }) {
+    final formulario = CaronaFormScreen(caronaId: caronaId);
+    if (MediaQuery.sizeOf(context).width < 840) {
+      return MaterialPage<void>(key: state.pageKey, child: formulario);
+    }
+
+    return CustomTransitionPage<void>(
+      key: state.pageKey,
+      opaque: false,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      barrierLabel: 'Formulário de carona',
+      child: Center(
+        child: Dialog(
+          child: SizedBox(
+            width: 620,
+            height: MediaQuery.sizeOf(context).height - 64,
+            child: formulario,
+          ),
+        ),
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(opacity: animation, child: child),
+    );
+  }
 }
 
 class AppShell extends StatelessWidget {
