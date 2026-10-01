@@ -56,6 +56,11 @@ class Caronas extends Table with _CamposComuns {
 @TableIndex(name: 'idx_transacoes_tipo_categoria', columns: {#tipo, #categoria})
 @TableIndex(name: 'idx_transacoes_sincronizado', columns: {#sincronizado})
 @TableIndex(name: 'idx_transacoes_atualizado_em', columns: {#atualizadoEm})
+@TableIndex(
+  name: 'idx_transacoes_carona_id_unique',
+  columns: {#caronaId},
+  unique: true,
+)
 class Transacoes extends Table with _CamposComuns {
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -75,6 +80,11 @@ class Transacoes extends Table with _CamposComuns {
 
 @TableIndex(name: 'idx_abastecimentos_sincronizado', columns: {#sincronizado})
 @TableIndex(name: 'idx_abastecimentos_atualizado_em', columns: {#atualizadoEm})
+@TableIndex(
+  name: 'idx_abastecimentos_transacao_id_unique',
+  columns: {#transacaoId},
+  unique: true,
+)
 class Abastecimentos extends Table with _CamposComuns {
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -99,6 +109,11 @@ class Abastecimentos extends Table with _CamposComuns {
 @TableIndex(
   name: 'idx_configuracoes_veiculo_atualizado_em',
   columns: {#atualizadoEm},
+)
+@TableIndex(
+  name: 'idx_configuracoes_veiculo_usuario_id_unique',
+  columns: {#usuarioId},
+  unique: true,
 )
 class ConfiguracoesVeiculo extends Table with _CamposComuns {
   @override

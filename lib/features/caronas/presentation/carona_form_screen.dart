@@ -309,11 +309,11 @@ class _CaronaFormFieldsState extends ConsumerState<_CaronaFormFields> {
     final origem = _textoOpcional(_origemController.text);
     final destino = _textoOpcional(_destinoController.text);
     final observacao = _textoOpcional(_observacaoController.text);
-    final repositorio = ref.read(caronaRepositoryProvider);
+    final servico = ref.read(caronaPagamentoServiceProvider);
 
     try {
       if (widget.carona == null) {
-        await repositorio.criar(
+        await servico.criar(
           passageiroNome: nome,
           valorCentavos: valorCentavos,
           data: _data,
@@ -325,7 +325,7 @@ class _CaronaFormFieldsState extends ConsumerState<_CaronaFormFields> {
       } else {
         final original = widget.carona!;
         final passageiroId = _passageiroId ?? await _resolverPassageiroId(nome);
-        await repositorio.editar(
+        await servico.editar(
           Carona(
             id: original.carona.id,
             passageiroId: passageiroId,
@@ -376,7 +376,7 @@ class _CaronaFormFieldsState extends ConsumerState<_CaronaFormFields> {
     if (confirmar != true || !mounted) return;
 
     await ref
-        .read(caronaRepositoryProvider)
+        .read(caronaPagamentoServiceProvider)
         .excluirLogicamente(widget.carona!.carona.id);
     if (mounted) Navigator.of(context).pop(false);
   }

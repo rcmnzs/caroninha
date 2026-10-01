@@ -185,4 +185,99 @@ void main() {
     expect(registros.length, 1);
     expect(registros.single.excluido, isTrue);
   });
+
+  test('relacoes um para um devem rejeitar registros duplicados', () async {
+    await db
+        .into(db.passageiros)
+        .insert(PassageirosCompanion.insert(id: 'pass-unique', nome: 'Bia'));
+    await db
+        .into(db.caronas)
+        .insert(
+          CaronasCompanion.insert(
+            id: 'car-unique',
+            passageiroId: 'pass-unique',
+            valorCentavos: 1000,
+            data: DateTime.utc(2026, 1, 1),
+          ),
+        );
+    await db
+        .into(db.transacoes)
+        .insert(
+          TransacoesCompanion.insert(
+            id: 'trans-carona-1',
+            tipo: TipoTransacao.receita,
+            categoria: CategoriaTransacao.carona,
+            valorCentavos: 1000,
+            data: DateTime.utc(2026, 1, 1),
+            caronaId: const Value('car-unique'),
+          ),
+        );
+
+    await expectLater(
+      db
+          .into(db.transacoes)
+          .insert(
+            TransacoesCompanion.insert(
+              id: 'trans-carona-2',
+              tipo: TipoTransacao.receita,
+              categoria: CategoriaTransacao.carona,
+              valorCentavos: 1000,
+              data: DateTime.utc(2026, 1, 1),
+              caronaId: const Value('car-unique'),
+            ),
+          ),
+      throwsA(anything),
+    );
+
+    await db
+        .into(db.transacoes)
+        .insert(
+          TransacoesCompanion.insert(
+            id: 'trans-abastecimento',
+            tipo: TipoTransacao.despesa,
+            categoria: CategoriaTransacao.combustivel,
+            valorCentavos: 5000,
+            data: DateTime.utc(2026, 1, 2),
+          ),
+        );
+    AbastecimentosCompanion abastecimento(String id) {
+      return AbastecimentosCompanion.insert(
+        id: id,
+        data: DateTime.utc(2026, 1, 2),
+        litros: 10,
+        precoLitroCentavos: 500,
+        valorTotalCentavos: 5000,
+        kmOdometro: 1000,
+        transacaoId: const Value('trans-abastecimento'),
+      );
+    }
+
+    await db.into(db.abastecimentos).insert(abastecimento('abast-1'));
+    await expectLater(
+      db.into(db.abastecimentos).insert(abastecimento('abast-2')),
+      throwsA(anything),
+    );
+
+    await db
+        .into(db.configuracoesVeiculo)
+        .insert(
+          ConfiguracoesVeiculoCompanion.insert(
+            id: 'config-1',
+            tipoCombustivel: 'gasolina',
+            odometroInicial: 1000,
+          ),
+        );
+    await expectLater(
+      db
+          .into(db.configuracoesVeiculo)
+          .insert(
+            ConfiguracoesVeiculoCompanion.insert(
+              id: 'config-2',
+              tipoCombustivel: 'etanol',
+              odometroInicial: 2000,
+            ),
+          ),
+      throwsA(anything),
+    );
+  });
 }

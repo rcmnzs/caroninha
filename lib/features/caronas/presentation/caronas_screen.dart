@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -133,6 +135,7 @@ class _CaronasScreenState extends ConsumerState<CaronasScreen> {
             ItemCarona(
               item: item,
               onTap: () => _abrirFormulario(context, item.carona.id),
+              onTogglePagamento: () => _alternarPagamento(item),
             ),
         ],
       ],
@@ -179,15 +182,15 @@ class _CaronasScreenState extends ConsumerState<CaronasScreen> {
   }
 
   Future<void> _inserirDadosDeExemplo() async {
-    final repositorio = ref.read(caronaRepositoryProvider);
+    final servico = ref.read(caronaPagamentoServiceProvider);
     final hoje = DateTime.now();
-    await repositorio.criar(
+    await servico.criar(
       passageiroNome: 'Marina Exemplo',
       valorCentavos: 4500,
       data: hoje,
       pago: true,
     );
-    await repositorio.criar(
+    await servico.criar(
       passageiroNome: 'Carlos Exemplo',
       valorCentavos: 3200,
       data: hoje.subtract(const Duration(days: 1)),
@@ -196,5 +199,55 @@ class _CaronasScreenState extends ConsumerState<CaronasScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Duas caronas de exemplo foram inseridas.')),
     );
+  }
+
+  Future<void> _alternarPagamento(CaronaComPassageiro item) async {
+    try {
+      final atualizada = await ref
+          .read(caronaPagamentoServiceProvider)
+          .alternarPagamento(item.carona.id);
+      if (!mounted) return;
+
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            atualizada.pago
+                ? 'Carona marcada como paga.'
+                : 'Carona marcada como pendente.',
+          ),
+          action: SnackBarAction(
+            label: 'Desfazer',
+            onPressed: () =>
+                unawaited(_desfazerPagamento(item.carona.id, item.carona.pago)),
+          ),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível atualizar o pagamento.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _desfazerPagamento(String caronaId, bool pagoAnterior) async {
+    try {
+      await ref
+          .read(caronaPagamentoServiceProvider)
+          .definirPagamento(caronaId, pago: pagoAnterior);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Alteração de pagamento desfeita.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível desfazer o pagamento.')),
+      );
+    }
   }
 }

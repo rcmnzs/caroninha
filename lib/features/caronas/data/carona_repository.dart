@@ -29,6 +29,32 @@ class CaronaRepository {
     String? destino,
     String? observacao,
     String usuarioId = 'local',
+  }) {
+    return _database.transaction(
+      () => criarEmTransacao(
+        passageiroNome: passageiroNome,
+        passageiroTelefone: passageiroTelefone,
+        valorCentavos: valorCentavos,
+        data: data,
+        pago: pago,
+        origem: origem,
+        destino: destino,
+        observacao: observacao,
+        usuarioId: usuarioId,
+      ),
+    );
+  }
+
+  Future<Carona> criarEmTransacao({
+    required String passageiroNome,
+    String? passageiroTelefone,
+    required int valorCentavos,
+    required DateTime? data,
+    bool pago = false,
+    String? origem,
+    String? destino,
+    String? observacao,
+    String usuarioId = 'local',
   }) async {
     Carona.validar(valorCentavos: valorCentavos, data: data);
     final nome = passageiroNome.trim();
@@ -36,59 +62,59 @@ class CaronaRepository {
       throw ArgumentError.value(passageiroNome, 'passageiroNome');
     }
 
-    return _database.transaction(() async {
-      final agora = DateTime.now().toUtc();
-      final passageiros = await (_database.select(
-        _database.passageiros,
-      )..where((tbl) => tbl.excluido.equals(false))).get();
-      banco.Passageiro? passageiroExistente;
-      for (final passageiro in passageiros) {
-        if (normalizarNomePassageiro(passageiro.nome) ==
-            normalizarNomePassageiro(nome)) {
-          passageiroExistente = passageiro;
-          break;
-        }
+    final agora = DateTime.now().toUtc();
+    final passageiros = await (_database.select(
+      _database.passageiros,
+    )..where((tbl) => tbl.excluido.equals(false))).get();
+    banco.Passageiro? passageiroExistente;
+    for (final passageiro in passageiros) {
+      if (normalizarNomePassageiro(passageiro.nome) ==
+          normalizarNomePassageiro(nome)) {
+        passageiroExistente = passageiro;
+        break;
       }
+    }
 
-      final passageiro =
-          passageiroExistente ??
-          await _database
-              .into(_database.passageiros)
-              .insertReturning(
-                banco.PassageirosCompanion.insert(
-                  id: const Uuid().v4(),
-                  usuarioId: Value(usuarioId),
-                  criadoEm: Value(agora),
-                  atualizadoEm: Value(agora),
-                  nome: nome,
-                  telefone: Value(passageiroTelefone),
-                  sincronizado: const Value(false),
-                ),
-              );
-
-      final carona = await _database
-          .into(_database.caronas)
-          .insertReturning(
-            banco.CaronasCompanion.insert(
-              id: const Uuid().v4(),
-              passageiroId: passageiro.id,
-              valorCentavos: valorCentavos,
-              data: data!.toUtc(),
-              pago: Value(pago),
-              origem: Value(origem),
-              destino: Value(destino),
-              observacao: Value(observacao),
-              usuarioId: Value(usuarioId),
-              criadoEm: Value(agora),
-              atualizadoEm: Value(agora),
-              sincronizado: const Value(false),
-            ),
-          );
-      return _mapearCarona(carona);
-    });
+    final passageiro =
+        passageiroExistente ??
+        await _database
+            .into(_database.passageiros)
+            .insertReturning(
+              banco.PassageirosCompanion.insert(
+                id: const Uuid().v4(),
+                usuarioId: Value(usuarioId),
+                criadoEm: Value(agora),
+                atualizadoEm: Value(agora),
+                nome: nome,
+                telefone: Value(passageiroTelefone),
+                sincronizado: const Value(false),
+              ),
+            );
+    final carona = await _database
+        .into(_database.caronas)
+        .insertReturning(
+          banco.CaronasCompanion.insert(
+            id: const Uuid().v4(),
+            passageiroId: passageiro.id,
+            valorCentavos: valorCentavos,
+            data: data!.toUtc(),
+            pago: Value(pago),
+            origem: Value(origem),
+            destino: Value(destino),
+            observacao: Value(observacao),
+            usuarioId: Value(usuarioId),
+            criadoEm: Value(agora),
+            atualizadoEm: Value(agora),
+            sincronizado: const Value(false),
+          ),
+        );
+    return _mapearCarona(carona);
   }
 
-  Future<Carona> editar(Carona carona) async {
+  Future<Carona> editar(Carona carona) =>
+      _database.transaction(() => editarEmTransacao(carona));
+
+  Future<Carona> editarEmTransacao(Carona carona) async {
     Carona.validar(valorCentavos: carona.valorCentavos, data: carona.data);
     final passageiro =
         await (_database.select(_database.passageiros)..where(
@@ -134,7 +160,10 @@ class CaronaRepository {
     );
   }
 
-  Future<void> excluirLogicamente(String id) async {
+  Future<void> excluirLogicamente(String id) =>
+      _database.transaction(() => excluirLogicamenteEmTransacao(id));
+
+  Future<void> excluirLogicamenteEmTransacao(String id) async {
     final existente =
         await (_database.select(_database.caronas)
               ..where((tbl) => tbl.id.equals(id) & tbl.excluido.equals(false)))

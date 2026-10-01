@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/banco/app_database.dart';
 import '../domain/carona_com_passageiro.dart';
+import '../../financeiro/data/transacao_repository.dart';
+import 'carona_pagamento_service.dart';
 import 'carona_repository.dart';
 import 'passageiro_repository.dart';
 
@@ -11,6 +13,18 @@ final passageiroRepositoryProvider = Provider<PassageiroRepository>(
 
 final caronaRepositoryProvider = Provider<CaronaRepository>(
   (ref) => CaronaRepository(ref.watch(appDatabaseProvider)),
+);
+
+final transacaoRepositoryProvider = Provider<TransacaoRepository>(
+  (ref) => TransacaoRepository(ref.watch(appDatabaseProvider)),
+);
+
+final caronaPagamentoServiceProvider = Provider<CaronaPagamentoService>(
+  (ref) => CaronaPagamentoService(
+    ref.watch(appDatabaseProvider),
+    ref.watch(caronaRepositoryProvider),
+    ref.watch(transacaoRepositoryProvider),
+  ),
 );
 
 final caronaPorIdProvider = FutureProvider.family<CaronaComPassageiro?, String>(

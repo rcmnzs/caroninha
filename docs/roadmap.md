@@ -7,7 +7,7 @@ Regras: uma tarefa por vez; ao final de cada uma rodar `flutter analyze` e `flut
 - [x] **T1.1 Estrutura do projeto**
       Prompt: "Configure o projeto conforme `.github/copilot-instructions.md`: adicione dependências (riverpod, drift, go_router, intl, uuid, fl_chart), crie a estrutura `lib/core` e `lib/features/{caronas,financeiro,configuracoes}`, tema Material 3 em pt-BR e navegação com 3 abas inferiores (Caronas, Financeiro, Config.) com telas vazias."
 
-- [ ] **T1.2 Banco local**
+- [x] **T1.2 Banco local**
       Prompt: "Crie o banco Drift com as tabelas Passageiro, Carona, Transacao, Abastecimento e ConfiguracaoVeiculo conforme `docs/modelo-dados.md`, incluindo campos comuns e índices. Não crie telas."
 
 - [x] **T1.3 Repositório de caronas**
@@ -19,7 +19,7 @@ Regras: uma tarefa por vez; ao final de cada uma rodar `flutter analyze` e `flut
 - [x] **T1.5 Formulário de carona**
       Prompt: "Implemente o formulário de nova/editar carona: nome com autocomplete de passageiros existentes, valor em R$, data e switch 'pago' (RF01, RF03, RF06). Validar RN01 e RN02. Máximo de 3 toques no fluxo comum."
 
-- [ ] **T1.6 Pago/pendente e receita automática**
+- [x] **T1.6 Pago/pendente e receita automática**
       Prompt: "Implemente RN03: ao marcar uma carona como paga, gerar a Transacao de receita; ao desmarcar ou excluir, reverter. Inclua testes unitários cobrindo todos os cenários."
 
 - [ ] **T1.7 Despesas e saldo**

@@ -1,5 +1,8 @@
 import 'package:caroninha_do_cesinha/core/banco/app_database.dart';
+import 'package:caroninha_do_cesinha/core/banco/enums.dart';
+import 'package:caroninha_do_cesinha/features/caronas/data/carona_pagamento_service.dart';
 import 'package:caroninha_do_cesinha/features/caronas/data/carona_repository.dart';
+import 'package:caroninha_do_cesinha/features/financeiro/data/transacao_repository.dart';
 import 'package:caroninha_do_cesinha/features/caronas/presentation/carona_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,9 +30,7 @@ void main() {
     await _desmontar(tester);
   });
 
-  testWidgets('salva uma carona com passageiro novo sem gerar transacao', (
-    tester,
-  ) async {
+  testWidgets('salva uma carona paga com receita vinculada', (tester) async {
     await _montarFormulario(tester, database: database);
 
     await tester.enterText(
@@ -50,7 +51,11 @@ void main() {
     expect(carona.pago, isTrue);
     expect(carona.data, isNotNull);
     expect(passageiro.nome, 'Larissa Exemplo');
-    expect(await database.select(database.transacoes).get(), isEmpty);
+    final receita = await database.select(database.transacoes).getSingle();
+    expect(receita.tipo, TipoTransacao.receita);
+    expect(receita.categoria, CategoriaTransacao.carona);
+    expect(receita.valorCentavos, 3250);
+    expect(receita.caronaId, carona.id);
     await _desmontar(tester);
   });
 
@@ -86,11 +91,17 @@ void main() {
   });
 
   testWidgets('confirma exclusao logica de carona', (tester) async {
-    final criada = await CaronaRepository(database).criar(
-      passageiroNome: 'Camila',
-      valorCentavos: 2200,
-      data: DateTime.utc(2026, 5, 7),
-    );
+    final criada =
+        await CaronaPagamentoService(
+          database,
+          CaronaRepository(database),
+          TransacaoRepository(database),
+        ).criar(
+          passageiroNome: 'Camila',
+          valorCentavos: 2200,
+          data: DateTime.utc(2026, 5, 7),
+          pago: true,
+        );
     await _montarFormulario(tester, database: database, caronaId: criada.id);
 
     await tester.tap(find.byKey(const Key('excluirCarona')));
@@ -101,7 +112,9 @@ void main() {
 
     final registro = await database.select(database.caronas).getSingle();
     expect(registro.excluido, isTrue);
-    expect(await database.select(database.transacoes).get(), isEmpty);
+    final receita = await database.select(database.transacoes).getSingle();
+    expect(receita.excluido, isTrue);
+    expect(receita.sincronizado, isFalse);
     await _desmontar(tester);
   });
 }

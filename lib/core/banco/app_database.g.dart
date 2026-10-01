@@ -3436,6 +3436,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_transacoes_atualizado_em',
     'CREATE INDEX idx_transacoes_atualizado_em ON transacoes (atualizado_em)',
   );
+  late final Index idxTransacoesCaronaIdUnique = Index(
+    'idx_transacoes_carona_id_unique',
+    'CREATE UNIQUE INDEX idx_transacoes_carona_id_unique ON transacoes (carona_id)',
+  );
   late final Index idxAbastecimentosSincronizado = Index(
     'idx_abastecimentos_sincronizado',
     'CREATE INDEX idx_abastecimentos_sincronizado ON abastecimentos (sincronizado)',
@@ -3444,6 +3448,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_abastecimentos_atualizado_em',
     'CREATE INDEX idx_abastecimentos_atualizado_em ON abastecimentos (atualizado_em)',
   );
+  late final Index idxAbastecimentosTransacaoIdUnique = Index(
+    'idx_abastecimentos_transacao_id_unique',
+    'CREATE UNIQUE INDEX idx_abastecimentos_transacao_id_unique ON abastecimentos (transacao_id)',
+  );
   late final Index idxConfiguracoesVeiculoSincronizado = Index(
     'idx_configuracoes_veiculo_sincronizado',
     'CREATE INDEX idx_configuracoes_veiculo_sincronizado ON configuracoes_veiculo (sincronizado)',
@@ -3451,6 +3459,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index idxConfiguracoesVeiculoAtualizadoEm = Index(
     'idx_configuracoes_veiculo_atualizado_em',
     'CREATE INDEX idx_configuracoes_veiculo_atualizado_em ON configuracoes_veiculo (atualizado_em)',
+  );
+  late final Index idxConfiguracoesVeiculoUsuarioIdUnique = Index(
+    'idx_configuracoes_veiculo_usuario_id_unique',
+    'CREATE UNIQUE INDEX idx_configuracoes_veiculo_usuario_id_unique ON configuracoes_veiculo (usuario_id)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -3473,10 +3485,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxTransacoesTipoCategoria,
     idxTransacoesSincronizado,
     idxTransacoesAtualizadoEm,
+    idxTransacoesCaronaIdUnique,
     idxAbastecimentosSincronizado,
     idxAbastecimentosAtualizadoEm,
+    idxAbastecimentosTransacaoIdUnique,
     idxConfiguracoesVeiculoSincronizado,
     idxConfiguracoesVeiculoAtualizadoEm,
+    idxConfiguracoesVeiculoUsuarioIdUnique,
   ];
 }
 

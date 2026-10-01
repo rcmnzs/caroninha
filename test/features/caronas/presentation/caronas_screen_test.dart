@@ -1,9 +1,14 @@
 import 'package:caroninha_do_cesinha/features/caronas/data/caronas_providers.dart';
+import 'package:caroninha_do_cesinha/features/caronas/data/carona_pagamento_service.dart';
+import 'package:caroninha_do_cesinha/features/caronas/data/carona_repository.dart';
 import 'package:caroninha_do_cesinha/features/caronas/domain/carona.dart';
 import 'package:caroninha_do_cesinha/features/caronas/domain/carona_com_passageiro.dart';
 import 'package:caroninha_do_cesinha/features/caronas/domain/passageiro.dart';
 import 'package:caroninha_do_cesinha/features/caronas/presentation/caronas_screen.dart';
 import 'package:caroninha_do_cesinha/features/caronas/presentation/periodo_caronas.dart';
+import 'package:caroninha_do_cesinha/core/banco/app_database.dart'
+    hide Carona, Passageiro;
+import 'package:caroninha_do_cesinha/features/financeiro/data/transacao_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,6 +60,51 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('alterna pagamento pela lista e desfaz com SnackBar', (
+    tester,
+  ) async {
+    final database = AppDatabase.memory();
+    final service = CaronaPagamentoService(
+      database,
+      CaronaRepository(database),
+      TransacaoRepository(database),
+    );
+    final carona = await service.criar(
+      passageiroNome: 'Helena',
+      valorCentavos: 2750,
+      data: DateTime.now(),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+        child: const MaterialApp(home: CaronasScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(ValueKey('alternar-pagamento-${carona.id}')));
+    await tester.pumpAndSettle();
+
+    expect((await database.select(database.caronas).getSingle()).pago, isTrue);
+    expect(
+      (await database.select(database.transacoes).getSingle()).excluido,
+      isFalse,
+    );
+    expect(find.text('Carona marcada como paga.'), findsOneWidget);
+
+    await tester.tap(find.text('Desfazer'));
+    await tester.pumpAndSettle();
+
+    expect((await database.select(database.caronas).getSingle()).pago, isFalse);
+    expect(
+      (await database.select(database.transacoes).getSingle()).excluido,
+      isTrue,
+    );
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 1));
+    await database.close();
   });
 }
 

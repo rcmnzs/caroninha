@@ -34,10 +34,28 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (migrator, from, to) async {
+      if (from < 2) {
+        await customStatement(
+          'CREATE UNIQUE INDEX IF NOT EXISTS '
+          'idx_transacoes_carona_id_unique ON transacoes (carona_id)',
+        );
+        await customStatement(
+          'CREATE UNIQUE INDEX IF NOT EXISTS '
+          'idx_abastecimentos_transacao_id_unique '
+          'ON abastecimentos (transacao_id)',
+        );
+        await customStatement(
+          'CREATE UNIQUE INDEX IF NOT EXISTS '
+          'idx_configuracoes_veiculo_usuario_id_unique '
+          'ON configuracoes_veiculo (usuario_id)',
+        );
+      }
+    },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON;');
     },
