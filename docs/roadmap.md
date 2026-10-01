@@ -10,7 +10,7 @@ Regras: uma tarefa por vez; ao final de cada uma rodar `flutter analyze` e `flut
 - [ ] **T1.2 Banco local**
       Prompt: "Crie o banco Drift com as tabelas Passageiro, Carona, Transacao, Abastecimento e ConfiguracaoVeiculo conforme `docs/modelo-dados.md`, incluindo campos comuns e índices. Não crie telas."
 
-- [ ] **T1.3 Repositório de caronas**
+- [x] **T1.3 Repositório de caronas**
       Prompt: "Implemente o repositório e os providers Riverpod de Carona e Passageiro (criar, editar, excluir logicamente, listar por data, filtrar por período). Valores em centavos. Inclua testes unitários."
 
 - [ ] **T1.4 Lista de caronas**

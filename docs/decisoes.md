@@ -14,6 +14,12 @@
 | Conflitos   | Last-write-wins por `atualizado_em` | Simples; uso por um único usuário         |
 | Arquitetura | Offline-first, por feature          | Banco local é a fonte primária            |
 
+## Banco local e geração Drift
+
+- Escolha do pacote: `drift` + `sqlite3_flutter_libs` + `path_provider` + `path`.
+- Essa combinação foi preferida em relação a `drift_flutter` porque oferece melhor compatibilidade com execução em Windows e Android sem depender de um wrapper específico do framework, mantendo o SQLite nativo da plataforma.
+- Os arquivos gerados pelo Drift (`*.g.dart`) ficam versionados no repositório para manter a compilação previsível em máquinas de desenvolvimento e CI, sem ignorá-los no `.gitignore`.
+
 ## Backend e sincronização (PENDENTE de prova de conceito)
 
 - Candidato principal: **Supabase** (Auth + PostgreSQL + API REST), por funcionar em Android e Windows.
