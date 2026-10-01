@@ -20,3 +20,24 @@ final caronasFiltradasProvider =
     ) {
       return ref.watch(caronaRepositoryProvider).watchFiltradas(filtro: filtro);
     });
+
+typedef ResumoCaronas = ({int recebidoCentavos, int pendenteCentavos});
+
+final resumoCaronasProvider =
+    Provider.family<AsyncValue<ResumoCaronas>, CaronaFiltro>((ref, filtro) {
+      return ref.watch(caronasFiltradasProvider(filtro)).whenData((caronas) {
+        var recebidoCentavos = 0;
+        var pendenteCentavos = 0;
+        for (final item in caronas) {
+          if (item.carona.pago) {
+            recebidoCentavos += item.carona.valorCentavos;
+          } else {
+            pendenteCentavos += item.carona.valorCentavos;
+          }
+        }
+        return (
+          recebidoCentavos: recebidoCentavos,
+          pendenteCentavos: pendenteCentavos,
+        );
+      });
+    });

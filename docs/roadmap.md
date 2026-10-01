@@ -13,7 +13,7 @@ Regras: uma tarefa por vez; ao final de cada uma rodar `flutter analyze` e `flut
 - [x] **T1.3 Repositório de caronas**
       Prompt: "Implemente o repositório e os providers Riverpod de Carona e Passageiro (criar, editar, excluir logicamente, listar por data, filtrar por período). Valores em centavos. Inclua testes unitários."
 
-- [ ] **T1.4 Lista de caronas**
+- [x] **T1.4 Lista de caronas**
       Prompt: "Implemente a tela de lista de caronas (mais recentes primeiro), com resumo de total recebido e pendente no topo (RF02, RF07)."
 
 - [ ] **T1.5 Formulário de carona**

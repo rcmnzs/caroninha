@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/caronas/presentation/caronas_placeholder_screen.dart';
+import '../../features/caronas/presentation/caronas_screen.dart';
+import '../../features/caronas/presentation/nova_carona_placeholder_screen.dart';
 import '../../features/configuracoes/presentation/configuracoes_placeholder_screen.dart';
 import '../../features/financeiro/presentation/financeiro_placeholder_screen.dart';
 
@@ -18,7 +19,14 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: '/caronas',
-                builder: (context, state) => const CaronasPlaceholderScreen(),
+                builder: (context, state) => const CaronasScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'nova',
+                    builder: (context, state) =>
+                        const NovaCaronaPlaceholderScreen(),
+                  ),
+                ],
               ),
             ],
           ),
