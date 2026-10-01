@@ -117,6 +117,32 @@ class TransacaoRepository {
     return linhas.map(_mapear).toList(growable: false);
   }
 
+  Stream<List<Transacao>> watchPorPeriodo(DateTime? inicio, DateTime? fim) {
+    final consulta = _database.select(_database.transacoes)
+      ..where((tbl) => tbl.excluido.equals(false));
+    if (inicio != null) {
+      consulta.where((tbl) => tbl.data.isBiggerOrEqualValue(inicio.toUtc()));
+    }
+    if (fim != null) {
+      consulta.where((tbl) => tbl.data.isSmallerOrEqualValue(fim.toUtc()));
+    }
+    consulta.orderBy([
+      (tbl) => OrderingTerm.desc(tbl.data),
+      (tbl) => OrderingTerm.desc(tbl.criadoEm),
+    ]);
+    return consulta.watch().map(
+      (linhas) => linhas.map(_mapear).toList(growable: false),
+    );
+  }
+
+  Future<Transacao?> buscarPorId(String id) async {
+    final linha =
+        await (_database.select(_database.transacoes)
+              ..where((tbl) => tbl.id.equals(id) & tbl.excluido.equals(false)))
+            .getSingleOrNull();
+    return linha == null ? null : _mapear(linha);
+  }
+
   Future<Transacao?> buscarPorCaronaId(String caronaId) async {
     final linha = await (_database.select(
       _database.transacoes,

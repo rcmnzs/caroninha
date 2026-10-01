@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../features/caronas/presentation/carona_form_screen.dart';
 import '../../features/caronas/presentation/caronas_screen.dart';
 import '../../features/configuracoes/presentation/configuracoes_placeholder_screen.dart';
-import '../../features/financeiro/presentation/financeiro_placeholder_screen.dart';
+import '../../features/financeiro/presentation/despesa_form_screen.dart';
+import '../../features/financeiro/presentation/financeiro_screen.dart';
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -47,8 +48,24 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: '/financeiro',
-                builder: (context, state) =>
-                    const FinanceiroPlaceholderScreen(),
+                builder: (context, state) => const FinanceiroScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'nova',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) =>
+                        _paginaDespesa(context, state),
+                  ),
+                  GoRoute(
+                    path: ':id/editar',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) => _paginaDespesa(
+                      context,
+                      state,
+                      transacaoId: state.pathParameters['id'],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -82,6 +99,36 @@ class AppRouter {
       barrierDismissible: false,
       barrierColor: Colors.black54,
       barrierLabel: 'Formulário de carona',
+      child: Center(
+        child: Dialog(
+          child: SizedBox(
+            width: 620,
+            height: MediaQuery.sizeOf(context).height - 64,
+            child: formulario,
+          ),
+        ),
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+          FadeTransition(opacity: animation, child: child),
+    );
+  }
+
+  static Page<void> _paginaDespesa(
+    BuildContext context,
+    GoRouterState state, {
+    String? transacaoId,
+  }) {
+    final formulario = DespesaFormScreen(transacaoId: transacaoId);
+    if (MediaQuery.sizeOf(context).width < 840) {
+      return MaterialPage<void>(key: state.pageKey, child: formulario);
+    }
+
+    return CustomTransitionPage<void>(
+      key: state.pageKey,
+      opaque: false,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      barrierLabel: 'Formulário de despesa',
       child: Center(
         child: Dialog(
           child: SizedBox(

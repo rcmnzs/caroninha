@@ -22,7 +22,7 @@ Regras: uma tarefa por vez; ao final de cada uma rodar `flutter analyze` e `flut
 - [x] **T1.6 Pago/pendente e receita automática**
       Prompt: "Implemente RN03: ao marcar uma carona como paga, gerar a Transacao de receita; ao desmarcar ou excluir, reverter. Inclua testes unitários cobrindo todos os cenários."
 
-- [ ] **T1.7 Despesas e saldo**
+- [x] **T1.7 Despesas e saldo**
       Prompt: "Implemente o cadastro de despesas com categorias (RF10) e a tela Financeiro com cards de receita, despesa e saldo do período (RF13, RN04), mais a lista de lançamentos. Inclua testes do cálculo do saldo."
 
 - [ ] **T1.8 Revisão da Fase 1**
